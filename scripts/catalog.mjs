@@ -1,12 +1,13 @@
-export const archive = 'https://foia.fm/bayarea/BART/';
 export const sounds = [
-  { id: 'doors', title: 'Doors closing', subtitle: 'The unmistakable beep-beep', icon: 'doors', color: 'blue', file: 'doors.wav', kind: 'Recreated effect' },
-  { id: 'next', title: 'Next station', subtitle: 'Embarcadero, here we come', icon: 'pin', color: 'orange', file: 'Next_Station_AF.wav', kind: 'BART announcement', text: 'The next station is Embarcadero.' },
-  { id: 'horn', title: 'Train horn', subtitle: 'Make an entrance', icon: 'horn', color: 'yellow', file: 'horn.wav', kind: 'Recreated effect' },
-  { id: 'ride', title: 'Tunnel scream', subtitle: 'If you know, you know', icon: 'wave', color: 'green', file: 'ride.wav', kind: 'Recreated effect' },
-  { id: 'richmond', title: 'Richmond', subtitle: 'Orange line, party of one', icon: 'train', color: 'orange', file: 'Richmond_AF.wav', kind: 'BART announcement', text: 'This is an orange line train to Richmond.' },
-  { id: 'sfo', title: 'SFO Airport', subtitle: 'Your costume has places to be', icon: 'plane', color: 'yellow', file: 'SFO_AF.wav', kind: 'BART announcement', text: 'This is a yellow line train to SFO Airport.' },
-  { id: 'last', title: 'End of the line', subtitle: 'A very polite way to leave', icon: 'flag', color: 'orange', file: 'EndofLine.wav', kind: 'BART announcement', text: 'Attention, end of line. All passengers must exit the train.' },
-  { id: 'red', title: 'Red line intro', subtitle: 'This is a red line train to…', icon: 'train', color: 'red', file: 'red_line.wav', kind: 'BART announcement', text: 'This is a red line train to.' },
-  { id: 'service', title: 'Out of service', subtitle: 'Officially off the clock', icon: 'moon', color: 'red', file: 'OutofService.wav', kind: 'BART announcement', text: 'Attention. This train is going out of service. All passengers must exit the train.' }
+  { id: 'announcer-ten', title: '10-car train', subtitle: 'In 8 minutes', icon: 'train', color: 'blue', file: 'DSS-ten-car.wav', kind: 'BART announcement', sourceFile: 'DSSAudioDemo.wav', excerpt: [17.58, 20.88] },
+  { id: 'announcer-six', title: '6-car train', subtitle: 'Platform 1', icon: 'train', color: 'green', file: 'DSS-six-car.wav', kind: 'BART announcement', sourceFile: 'DSSAudioDemo.wav', excerpt: [20.98, 24.36] },
+  { id: 'next', title: 'Next station', subtitle: 'Embarcadero', icon: 'pin', color: 'blue', file: 'Next_Station_AF.wav', kind: 'BART announcement' },
+  { id: 'berkeley', title: 'North Berkeley', subtitle: 'Station announcement', icon: 'pin', color: 'green', file: 'NorthBerkeley.wav', kind: 'BART announcement' },
+  { id: 'richmond', title: 'Richmond', subtitle: 'Orange line', icon: 'train', color: 'orange', file: 'Richmond_AF.wav', kind: 'BART announcement' },
+  { id: 'sfo', title: 'SFO Airport', subtitle: 'Yellow line', icon: 'plane', color: 'yellow', file: 'SFO_AF.wav', kind: 'BART announcement' },
+  { id: 'red', title: 'Red line', subtitle: 'Destination intro', icon: 'train', color: 'red', file: 'red_line.wav', kind: 'BART announcement' },
+  { id: 'last', title: 'End of the line', subtitle: 'All passengers exit', icon: 'flag', color: 'orange', file: 'EndofLine.wav', kind: 'BART announcement' },
+  { id: 'wheels', title: 'Loud wheels', subtitle: 'The real BART scream', icon: 'wave', color: 'yellow', file: '241915__alexbird__loud_wheels.wav', kind: 'Field recording', credit: 'alexbird', source: 'https://freesound.org/people/alexbird/sounds/241915/' },
+  { id: 'departure', title: 'Train departing', subtitle: 'Leaving the station', icon: 'train', color: 'blue', file: '38732__shimsewn__bart-departure.wav', kind: 'Field recording', credit: 'shimsewn', source: 'https://freesound.org/people/shimsewn/sounds/38732/', license: 'CC BY 4.0' },
+  { id: 'service', title: 'Out of service', subtitle: 'Everybody off', icon: 'moon', color: 'red', file: 'OutofService.wav', kind: 'BART announcement' }
 ];

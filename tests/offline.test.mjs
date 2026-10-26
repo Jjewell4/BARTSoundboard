@@ -4,14 +4,16 @@ import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
 import { sounds } from '../scripts/catalog.mjs';
 
-test('production soundboard contains all six supplied recordings', async () => {
+test('production soundboard contains only the supplied recordings and excerpts', async () => {
   const catalog = JSON.parse(await readFile('dist/sounds.json', 'utf8'));
-  assert.equal(catalog.length, 9);
-  assert.equal(catalog.filter(s => s.kind === 'BART announcement').length, 6);
+  assert.equal(catalog.length, 11);
+  assert.equal(catalog.filter(s => s.kind === 'BART announcement').length, 9);
+  assert.ok(catalog.every(s => ['BART announcement', 'Field recording'].includes(s.kind)));
   for (const sound of catalog) {
     const wav = await readFile(`dist${sound.url}`);
     assert.equal(wav.toString('ascii', 0, 4), 'RIFF');
     assert.equal(wav.toString('ascii', 8, 12), 'WAVE');
+    assert.deepEqual(wav, Buffer.from(await readFile(`audio/${sound.file}.b64`, 'utf8'), 'base64'));
   }
   assert.equal(new Set(sounds.map(s => s.id)).size, sounds.length);
 });
@@ -27,7 +29,7 @@ function worker() {
   });
   return async range => {
     let response;
-    events.fetch({ request: new Request('https://party.test/audio/horn.wav', { headers: range ? { Range: range } : {} }), respondWith: p => { response = p; } });
+    events.fetch({ request: new Request('https://party.test/audio/Next_Station_AF.wav', { headers: range ? { Range: range } : {} }), respondWith: p => { response = p; } });
     return response;
   };
 }

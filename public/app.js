@@ -10,9 +10,11 @@ const paths = {
   spark: '<path d="m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>',
   moon: '<path d="M21 14a9 9 0 0 1-11-11A9 9 0 1 0 21 14Z"/>'
 };
-let sounds = [], audio = null, activeId = null, loop = false, frame, db, utterance = null;
+let sounds = [], audio = null, activeId = null, loop = false, frame, db, updating = false;
 const custom = new Map();
 function render() {
+  $('#sounds').style.setProperty('--rows', Math.ceil(sounds.length / 3));
+  $('#sounds').style.setProperty('--landscape-rows', Math.ceil(sounds.length / 5));
   $('#sounds').replaceChildren(...sounds.map(sound => {
     const button = document.createElement('button');
     button.className = `sound-card ${sound.color}`;
@@ -36,7 +38,6 @@ function updateButtons() {
   });
 }
 function stop(message = 'Ready when you are') {
-  utterance = null; window.speechSynthesis?.cancel();
   if (audio) { audio.pause(); audio.removeAttribute('src'); audio.load(); audio = null; }
   cancelAnimationFrame(frame); activeId = null;
   $('#playing-title').textContent = message;
@@ -46,18 +47,6 @@ function stop(message = 'Ready when you are') {
 function play(sound) {
   if (activeId === sound.id) { stop(); return; }
   stop();
-  if (!sound.url && !custom.has(sound.id)) {
-    if (!window.speechSynthesis) { stop('Add the BART recordings to play this sound.'); return; }
-    activeId = sound.id; $('#stop').disabled = false; updateButtons();
-    const speak = () => {
-      const voice = new SpeechSynthesisUtterance(sound.text); utterance = voice;
-      voice.onstart = () => { if (utterance === voice) { $('#playing-title').textContent = `${sound.title} · demo`; $('#equalizer').classList.add('active'); } };
-      voice.onend = () => { if (utterance === voice) { if (loop) speak(); else stop(); } };
-      voice.onerror = () => { if (utterance === voice) stop('Demo voice unavailable · add a recording'); };
-      window.speechSynthesis.speak(voice);
-    };
-    speak(); return;
-  }
   const current = new Audio(custom.get(sound.id)?.url || sound.url);
   audio = current; activeId = sound.id; current.loop = loop;
   $('#playing-title').textContent = `Loading ${sound.title}…`;
@@ -85,10 +74,28 @@ $('#repeat').addEventListener('click', () => {
 document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
 window.addEventListener('pagehide', () => stop());
 const dialog = $('#info');
-for (const id of ['install', 'help']) $(`#${id}`).addEventListener('click', () => dialog.showModal());
+$('#install').addEventListener('click', () => dialog.showModal());
 for (const selector of ['.close', '.done']) $(selector).addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog && (event.clientX < dialog.getBoundingClientRect().left || event.clientX > dialog.getBoundingClientRect().right || event.clientY < dialog.getBoundingClientRect().top || event.clientY > dialog.getBoundingClientRect().bottom)) dialog.close(); });
-if (matchMedia('(display-mode: standalone)').matches || navigator.standalone) $('#install').textContent = 'How to play';
+function selectTab(tab) {
+  document.querySelectorAll('[data-tab]').forEach(button => {
+    const selected = button === tab;
+    button.setAttribute('aria-selected', String(selected)); button.tabIndex = selected ? 0 : -1;
+    $(`#${button.dataset.tab}`).hidden = !selected;
+  });
+  $('.dialog-content').scrollTop = 0;
+}
+const tabs = [...document.querySelectorAll('[data-tab]')];
+tabs.forEach((tab, index) => {
+  tab.addEventListener('click', () => selectTab(tab));
+  tab.addEventListener('keydown', event => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+    selectTab(tabs[next]); tabs[next].focus();
+  });
+});
+selectTab(tabs[0]);
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -146,7 +153,7 @@ async function offlineStatus() {
   const channel = new MessageChannel();
   channel.port1.onmessage = event => {
     label.classList.toggle('ready', event.data.ready);
-    label.textContent = event.data.ready ? (sounds.some(s => !s.url && !custom.has(s.id)) ? 'Effects saved · demo voices may need internet' : 'Saved for offline') : 'Not saved yet · reopen online';
+    label.textContent = event.data.ready ? 'Saved for offline' : 'Not saved yet · reopen online';
     channel.port1.close();
   };
   navigator.serviceWorker.controller.postMessage('STATUS', [channel.port2]);
@@ -156,6 +163,7 @@ async function init() {
     const response = await fetch('/sounds.json');
     if (!response.ok) throw new Error('Sound list failed');
     sounds = await response.json();
+    $('#excerpt-credit').hidden = !sounds.some(sound => sound.id.startsWith('announcer'));
     for (const sound of sounds) $('#custom-sound').add(new Option(sound.title, sound.id));
     try {
       db = await openDatabase();
@@ -164,12 +172,23 @@ async function init() {
     } catch { $('#custom-status').textContent = 'Custom recording storage is unavailable. Built-in sounds still work.'; }
     render();
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('controllerchange', offlineStatus);
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (updating) location.reload(); else offlineStatus();
+      });
       const registration = await navigator.serviceWorker.register('/sw.js');
-      if (registration.waiting) $('#offline-status').textContent = 'Update ready · close all app windows and reopen';
+      const showUpdate = () => { $('#update').hidden = !registration.waiting; };
+      showUpdate();
+      $('#update').addEventListener('click', () => {
+        if (!registration.waiting) return;
+        stop(); updating = true;
+        $('#update').disabled = true; $('#update').textContent = 'Updating…';
+        registration.waiting.postMessage('ACTIVATE_UPDATE');
+      });
       registration.addEventListener('updatefound', () => {
-        registration.installing?.addEventListener('statechange', () => {
-          if (registration.waiting) $('#offline-status').textContent = 'Update ready · close all app windows and reopen';
+        const worker = registration.installing;
+        worker?.addEventListener('statechange', () => {
+          showUpdate();
+          if (worker.state === 'redundant') $('#offline-status').textContent = 'Couldn’t save offline · reconnect and reopen';
         });
       });
       await navigator.serviceWorker.ready;
