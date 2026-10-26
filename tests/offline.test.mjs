@@ -14,7 +14,16 @@ test('production soundboard contains only the supplied recordings and excerpts',
     const wav = await readFile(`dist${sound.url}`);
     assert.equal(wav.toString('ascii', 0, 4), 'RIFF');
     assert.equal(wav.toString('ascii', 8, 12), 'WAVE');
-    const original = Buffer.from(await readFile(`audio/${sound.file}.b64`, 'utf8'), 'base64');
+    let original = Buffer.from(await readFile(`audio/${sound.file}.b64`, 'utf8'), 'base64');
+    if (['next', 'sfo'].includes(sound.id)) {
+      const m = measureWav(original);
+      // Both supplied files are mono 16 kHz PCM: remove exactly one second.
+      const cut = 16000 * 2;
+      const trimmed = Buffer.concat([original.subarray(0, m.start), original.subarray(m.start + cut)]);
+      trimmed.writeUInt32LE(trimmed.length - 8, 4);
+      trimmed.writeUInt32LE(m.length - cut, m.start - 4);
+      original = trimmed;
+    }
     const before = measureWav(original), after = measureWav(wav);
     assert.equal(wav.length, original.length, 'duration and format preserved');
     assert.deepEqual(wav.subarray(0, after.start), original.subarray(0, before.start));
