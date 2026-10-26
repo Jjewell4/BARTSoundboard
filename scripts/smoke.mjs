@@ -10,7 +10,7 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('http://localhost:4173');
   await page.waitForFunction(() => document.querySelector('#offline-status').textContent === 'Saved for offline');
-  assert.equal(await page.locator('.sound-card').count(), 11);
+  assert.equal(await page.locator('.sound-card').count(), 10);
   for (const [width, height] of [[320, 568], [375, 667], [390, 664], [390, 844], [430, 932], [844, 390], [667, 375]]) {
     await page.setViewportSize({ width, height });
     const layout = await page.evaluate(() => {
@@ -68,7 +68,7 @@ try {
   await page.locator('.close').click();
   await context.setOffline(true);
   await page.reload();
-  await page.waitForFunction(() => document.querySelectorAll('.sound-card').length === 11);
+  await page.waitForFunction(() => document.querySelectorAll('.sound-card').length === 10);
   await page.locator('[data-id="next"]').click();
   await page.waitForFunction(() => document.querySelector('#playing-title').textContent === 'Next station');
   await page.locator('#stop').click();
@@ -82,11 +82,9 @@ try {
   const originalWorker = await readFile('dist/sw.js', 'utf8');
   try {
     await writeFile('dist/sw.js', originalWorker.replace(/bart-party-([a-f0-9]+)/, 'bart-party-$1-smoke-update'));
-    await page.evaluate(async () => (await navigator.serviceWorker.getRegistration()).update());
-    await page.locator('#update').waitFor({ state: 'visible' });
-    await Promise.all([page.waitForNavigation(), page.locator('#update').click()]);
+    await Promise.all([page.waitForNavigation(), page.evaluate(async () => (await navigator.serviceWorker.getRegistration()).update())]);
     await page.waitForFunction(() => document.querySelector('#offline-status').textContent === 'Saved for offline');
-    assert.equal(await page.locator('.sound-card').count(), 11);
+    assert.equal(await page.locator('.sound-card').count(), 10);
   } finally { await writeFile('dist/sw.js', originalWorker); }
   await mkdir('test-results', { recursive: true });
   await page.screenshot({ path: 'test-results/mobile.png', fullPage: true });

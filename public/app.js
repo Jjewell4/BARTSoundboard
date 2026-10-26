@@ -173,7 +173,7 @@ async function init() {
     render();
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (updating) location.reload(); else offlineStatus();
+        offlineStatus();
       });
       const registration = await navigator.serviceWorker.register('/sw.js');
       const showUpdate = () => { $('#update').hidden = !registration.waiting; };
