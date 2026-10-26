@@ -1,8 +1,8 @@
 # BART Party
 
-A small iPhone PWA soundboard for a BART Halloween costume. Eight buttons fit in two columns and four rows on one screen, with Stop and Loop always visible. Help, installation instructions, personal recordings, and credits are behind the **?** button.
+A small iPhone PWA soundboard for a BART Halloween costume. Eight buttons fit in two columns and four rows on one screen, with Stop and Loop always visible. Help, installation instructions, personal recordings, and credits are behind the **i** button.
 
-The interface uses a white/blue/navy base with accents from [BART's published route colors](https://dev-api.bart.gov/docs/route/routes.aspx): blue `#0099cc`, red `#ff0000`, orange `#ff9933`, green `#339933`, and yellow `#ffff33`. Dark text keeps the lighter route colors readable.
+The interface takes inspiration from BART station signage: navy panels, bold white transport pictograms, square route badges, and restrained red, yellow, and sky-blue accents. Route letters distinguish the red and yellow announcements; the approaching train shows its platform number.
 
 ## Run locally
 
@@ -31,8 +31,8 @@ Only user-supplied recordings and two excerpts from the supplied demo are includ
 
 | Button | Source |
 | --- | --- |
-| 10-car train — In 8 minutes | DSSAudioDemo.wav, 17.58–20.88 seconds |
-| 6-car train — Platform 1 | DSSAudioDemo.wav, 20.98–24.36 seconds |
+| 10 car Milbrae — In 8 minutes | DSSAudioDemo.wav, 17.58–20.88 seconds |
+| Richmond approaching — Platform 1 | DSSAudioDemo.wav, 20.98–24.36 seconds |
 | Next station | Next_Station_AF.wav |
 | SFO Airport | SFO_AF.wav |
 | Red line — North Berkeley | red_line.wav followed by NorthBerkeley.wav, joined into RedLineNorthBerkeley.wav |
