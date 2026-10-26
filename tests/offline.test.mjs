@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
+import { measureWav } from '../scripts/normalize-wav.mjs';
 import { sounds } from '../scripts/catalog.mjs';
 
 test('production soundboard contains only the supplied recordings and excerpts', async () => {
@@ -13,7 +14,25 @@ test('production soundboard contains only the supplied recordings and excerpts',
     const wav = await readFile(`dist${sound.url}`);
     assert.equal(wav.toString('ascii', 0, 4), 'RIFF');
     assert.equal(wav.toString('ascii', 8, 12), 'WAVE');
-    assert.deepEqual(wav, Buffer.from(await readFile(`audio/${sound.file}.b64`, 'utf8'), 'base64'));
+    let original = Buffer.from(await readFile(`audio/${sound.file}.b64`, 'utf8'), 'base64');
+    if (['next', 'sfo'].includes(sound.id)) {
+      const m = measureWav(original);
+      // Both supplied files are mono 16 kHz PCM: remove exactly one second.
+      const cut = 16000 * 2;
+      const trimmed = Buffer.concat([original.subarray(0, m.start), original.subarray(m.start + cut)]);
+      trimmed.writeUInt32LE(trimmed.length - 8, 4);
+      trimmed.writeUInt32LE(m.length - cut, m.start - 4);
+      original = trimmed;
+    }
+    const before = measureWav(original), after = measureWav(wav);
+    assert.equal(wav.length, original.length, 'duration and format preserved');
+    assert.deepEqual(wav.subarray(0, after.start), original.subarray(0, before.start));
+    assert.ok(after.peak <= 10 ** (-1 / 20) + 1 / after.scale, 'peak headroom');
+    assert.ok(Math.abs(20 * Math.log10(after.rms) + 18) < .1, 'balanced active level');
+    const gain = after.rms / before.rms;
+    for (let offset = before.start; offset < before.start + before.length; offset += before.bytes) {
+      assert.ok(Math.abs(wav.readIntLE(offset, before.bytes) - original.readIntLE(offset, before.bytes) * gain) < 2, 'constant gain preserves waveform');
+    }
   }
   assert.equal(new Set(sounds.map(s => s.id)).size, sounds.length);
 });
