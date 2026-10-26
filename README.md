@@ -32,7 +32,7 @@ Only user-supplied recordings and two excerpts from the supplied demo are includ
 | Button | Source |
 | --- | --- |
 | 10 car Milbrae — In 8 minutes | DSSAudioDemo.wav, 17.58–20.88 seconds |
-| Richmond approaching — Platform 1 | DSSAudioDemo.wav, 20.98–24.36 seconds |
+| Richmond train — Platform 1 | DSSAudioDemo.wav, 20.98–24.36 seconds |
 | Next station | Next_Station_AF.wav |
 | SFO Airport | SFO_AF.wav |
 | Red line — North Berkeley | red_line.wav followed by NorthBerkeley.wav, joined into RedLineNorthBerkeley.wav |
