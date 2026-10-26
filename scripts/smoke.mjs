@@ -11,7 +11,7 @@ try {
   await page.goto('http://localhost:4173');
   await page.waitForFunction(() => document.querySelector('#offline-status').textContent === 'Saved for offline');
   assert.equal(await page.locator('.sound-card').count(), 8);
-  assert.deepEqual(await page.locator('.sound-card').evaluateAll(buttons => buttons.slice(-2).map(b => b.dataset.id)), ['wheels', 'departure']);
+  assert.deepEqual(await page.locator('.sound-card').evaluateAll(buttons => buttons.slice(-2).map(b => b.dataset.id)), ['departure', 'wheels']);
   assert.equal(await page.locator('[data-id="richmond"], [data-id="last"]').count(), 0);
   for (const [width, height] of [[320, 568], [375, 667], [390, 664], [390, 844], [430, 932], [844, 390], [667, 375]]) {
     await page.setViewportSize({ width, height });
