@@ -24,8 +24,8 @@ for (const sound of sounds) {
   catalog.push({ ...sound, url: `/audio/${sound.file}` });
 }
 await writeFile('dist/sounds.json', JSON.stringify(catalog));
-for (const size of [180, 192, 512]) await writeFile(`dist/icon-${size}.png`, icon(size));
-const assets = ['/', '/index.html', '/app.js', '/styles.css', '/signage.css', '/sounds.json', '/manifest.webmanifest', '/icon-180.png', '/icon-192.png', '/icon-512.png', ...catalog.map(s => s.url)];
+for (const size of [16, 32, 180, 192, 512]) await writeFile(`dist/bp-icon-${size}.png`, icon(size));
+const assets = ['/', '/index.html', '/app.js', '/styles.css', '/signage.css', '/sounds.json', '/manifest.webmanifest', '/bp-icon-16.png', '/bp-icon-32.png', '/bp-icon-180.png', '/bp-icon-192.png', '/bp-icon-512.png', ...catalog.map(s => s.url)];
 const hash = createHash('sha256');
 for (const path of assets.filter(p => p !== '/')) hash.update(await readFile(`dist${path}`));
 const sw = await readFile('public/sw.js', 'utf8'); hash.update(sw);
