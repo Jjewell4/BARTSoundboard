@@ -32,6 +32,22 @@ export function measureWav(buffer) {
   return { start, length, bytes, scale, peak, rms };
 }
 
+export function trimLead(source, seconds) {
+  const { start, length, bytes } = measureWav(source);
+  let formatOffset;
+  for (let offset = 12; offset + 8 <= source.length;) {
+    if (source.toString('ascii', offset, offset + 4) === 'fmt ') { formatOffset = offset + 8; break; }
+    const size = source.readUInt32LE(offset + 4); offset += 8 + size + size % 2;
+  }
+  const frames = Math.round(seconds * source.readUInt32LE(formatOffset + 4));
+  const cut = frames * source.readUInt16LE(formatOffset + 2) * bytes;
+  if (cut < 0 || cut >= length || cut % 2) throw new Error('Invalid leading trim');
+  const output = Buffer.concat([source.subarray(0, start), source.subarray(start + cut)]);
+  output.writeUInt32LE(output.length - 8, 4);
+  output.writeUInt32LE(length - cut, start - 4);
+  return output;
+}
+
 export function normalizeWav(source) {
   const measurement = measureWav(source);
   const { start, length, bytes, rms, peak } = measurement;
