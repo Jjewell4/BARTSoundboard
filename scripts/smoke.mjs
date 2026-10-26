@@ -10,18 +10,23 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('http://localhost:4173');
   await page.waitForFunction(() => document.querySelector('#offline-status').textContent === 'Saved for offline');
-  assert.equal(await page.locator('.sound-card').count(), 10);
+  assert.equal(await page.locator('.sound-card').count(), 8);
+  assert.deepEqual(await page.locator('.sound-card').evaluateAll(buttons => buttons.slice(-2).map(b => b.dataset.id)), ['wheels', 'departure']);
+  assert.equal(await page.locator('[data-id="richmond"], [data-id="last"]').count(), 0);
   for (const [width, height] of [[320, 568], [375, 667], [390, 664], [390, 844], [430, 932], [844, 390], [667, 375]]) {
     await page.setViewportSize({ width, height });
     const layout = await page.evaluate(() => {
       const cards = [...document.querySelectorAll('.sound-card')].map(b => b.getBoundingClientRect());
       const player = document.querySelector('.player').getBoundingClientRect();
+      const grid = getComputedStyle(document.querySelector('#sounds'));
+      const twoByFour = grid.gridTemplateColumns.split(' ').length === 2 && grid.gridTemplateRows.split(' ').length === 4;
       return { noScroll: document.documentElement.scrollWidth <= innerWidth && document.documentElement.scrollHeight <= innerHeight && document.body.scrollHeight <= innerHeight,
+        twoByFour,
         allVisible: cards.every(b => b.top >= 0 && b.left >= 0 && b.right <= innerWidth && b.bottom <= player.top),
         touchTargets: cards.every(b => b.width >= 44 && b.height >= 44),
         labelsFit: [...document.querySelectorAll('.sound-card')].every(b => b.scrollHeight <= b.clientHeight && b.scrollWidth <= b.clientWidth) };
     });
-    assert.deepEqual(layout, { noScroll: true, allVisible: true, touchTargets: true, labelsFit: true }, `${width}x${height}`);
+    assert.deepEqual(layout, { noScroll: true, twoByFour: true, allVisible: true, touchTargets: true, labelsFit: true }, `${width}x${height}`);
   }
   await page.setViewportSize({ width: 390, height: 844 });
   const decoded = await page.evaluate(async () => {
@@ -55,7 +60,7 @@ try {
   assert.equal(await page.locator('dialog').isVisible(), true);
   await page.locator('#tab-custom').click();
   await page.selectOption('#custom-sound', 'next');
-  await page.setInputFiles('#audio-file', 'dist/audio/EndofLine.wav');
+  await page.setInputFiles('#audio-file', 'dist/audio/SFO_AF.wav');
   await page.waitForFunction(() => document.querySelector('#custom-status').textContent.includes('Saved on this device'));
   await page.locator('.close').click();
   await page.reload();
@@ -68,7 +73,7 @@ try {
   await page.locator('.close').click();
   await context.setOffline(true);
   await page.reload();
-  await page.waitForFunction(() => document.querySelectorAll('.sound-card').length === 10);
+  await page.waitForFunction(() => document.querySelectorAll('.sound-card').length === 8);
   await page.locator('[data-id="next"]').click();
   await page.waitForFunction(() => document.querySelector('#playing-title').textContent === 'Next station');
   await page.locator('#stop').click();
@@ -84,7 +89,7 @@ try {
     await writeFile('dist/sw.js', originalWorker.replace(/bart-party-([a-f0-9]+)/, 'bart-party-$1-smoke-update'));
     await Promise.all([page.waitForNavigation(), page.evaluate(async () => (await navigator.serviceWorker.getRegistration()).update())]);
     await page.waitForFunction(() => document.querySelector('#offline-status').textContent === 'Saved for offline');
-    assert.equal(await page.locator('.sound-card').count(), 10);
+    assert.equal(await page.locator('.sound-card').count(), 8);
   } finally { await writeFile('dist/sw.js', originalWorker); }
   await mkdir('test-results', { recursive: true });
   await page.screenshot({ path: 'test-results/mobile.png', fullPage: true });

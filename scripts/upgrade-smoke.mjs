@@ -33,22 +33,22 @@ try {
   await page.reload();
   assert.equal(await page.locator('#legacy').count(), 1);
   await Promise.all([page.waitForNavigation(), page.evaluate(async () => (await navigator.serviceWorker.getRegistration()).update())]);
-  await page.waitForFunction(() => document.querySelectorAll('.sound-card').length === 10);
+  await page.waitForFunction(() => document.querySelectorAll('.sound-card').length === 8);
   assert.equal(await page.locator('#legacy').count(), 0);
   await page.waitForFunction(() => document.querySelector('#offline-status').textContent === 'Saved for offline');
   assert.equal(await page.evaluate(async () => (await caches.keys()).includes('bart-party-legacy')), false);
   // Recovery page must preserve personal audio, not clear IndexedDB.
   await page.locator('#install').click(); await page.locator('#tab-custom').click();
   await page.selectOption('#custom-sound', 'next');
-  await page.setInputFiles('#audio-file', 'dist/audio/EndofLine.wav');
+  await page.setInputFiles('#audio-file', 'dist/audio/SFO_AF.wav');
   await page.waitForFunction(() => document.querySelector('#custom-status').textContent.includes('Saved on this device'));
   await page.goto('http://127.0.0.1:4174/refresh.html');
   await page.waitForURL('**/?refreshed=*');
   await page.waitForFunction(() => document.querySelector('[data-id="next"] .sound-kind')?.textContent === 'Your recording');
   await page.waitForFunction(() => document.querySelector('#offline-status').textContent === 'Saved for offline');
   await context.setOffline(true); await page.reload();
-  await page.waitForFunction(() => document.querySelectorAll('.sound-card').length === 10);
+  await page.waitForFunction(() => document.querySelectorAll('.sound-card').length === 8);
   await page.locator('[data-id="announcer-six"]').click();
   await page.waitForFunction(() => document.querySelector('#playing-title').textContent === 'Richmond approaching');
-  console.log('PASS: reproduced stale Chrome page, automatically migrated it to 10 sounds, removed old cache, recovered without losing custom audio, and played offline.');
+  console.log('PASS: reproduced stale Chrome page, automatically migrated it to 8 sounds, removed old cache, recovered without losing custom audio, and played offline.');
 } finally { await browser.close(); await new Promise(resolve => server.close(resolve)); }
