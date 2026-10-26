@@ -6,8 +6,8 @@ import { sounds } from '../scripts/catalog.mjs';
 
 test('production soundboard contains only the supplied recordings and excerpts', async () => {
   const catalog = JSON.parse(await readFile('dist/sounds.json', 'utf8'));
-  assert.equal(catalog.length, 10);
-  assert.equal(catalog.filter(s => s.kind === 'BART announcement').length, 8);
+  assert.equal(catalog.length, 8);
+  assert.equal(catalog.filter(s => s.kind === 'BART announcement').length, 6);
   assert.ok(catalog.every(s => ['BART announcement', 'Field recording'].includes(s.kind)));
   for (const sound of catalog) {
     const wav = await readFile(`dist${sound.url}`);
