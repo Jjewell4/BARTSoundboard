@@ -13,8 +13,7 @@ const paths = {
 let sounds = [], audio = null, activeId = null, loop = false, frame, db, updating = false;
 const custom = new Map();
 function render() {
-  $('#sounds').style.setProperty('--rows', Math.ceil(sounds.length / 3));
-  $('#sounds').style.setProperty('--landscape-rows', Math.ceil(sounds.length / 5));
+  $('#sounds').style.setProperty('--rows', Math.ceil(sounds.length / 2));
   $('#sounds').replaceChildren(...sounds.map(sound => {
     const button = document.createElement('button');
     button.className = `sound-card ${sound.color}`;
