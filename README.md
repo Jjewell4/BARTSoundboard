@@ -1,6 +1,6 @@
 # BART Party
 
-A small iPhone PWA soundboard for a BART Halloween costume. Ten buttons fit on one screen, with Stop and Loop always visible. Help, installation instructions, personal recordings, and credits are behind the **?** button.
+A small iPhone PWA soundboard for a BART Halloween costume. Eight buttons fit in two columns and four rows on one screen, with Stop and Loop always visible. Help, installation instructions, personal recordings, and credits are behind the **?** button.
 
 The interface uses a white/blue/navy base with accents from [BART's published route colors](https://dev-api.bart.gov/docs/route/routes.aspx): blue `#0099cc`, red `#ff0000`, orange `#ff9933`, green `#339933`, and yellow `#ffff33`. Dark text keeps the lighter route colors readable.
 
@@ -23,6 +23,8 @@ On iPhone, open the HTTPS link in Safari → Share → Add to Home Screen. Keep 
 
 Updates automatically activate after the entire new release has been cached, then reload existing app tabs. This also migrates the original cache-first release, which could otherwise keep showing the old UI indefinitely. If a browser is still stuck, open `/refresh.html` while online. It refreshes this app's service worker and offline cache without deleting personal recordings. Custom recordings are stored only on the device in IndexedDB; import them inside the installed app. Removing browser data can remove them.
 
+The bottom row contains **Loud wheels** and **Train departing**. The standalone Richmond and End of the line buttons have been removed.
+
 ## Audio inventory and credits
 
 Only user-supplied recordings and two excerpts from the supplied demo are included. No generated effects or demo speech remains.
@@ -32,15 +34,13 @@ Only user-supplied recordings and two excerpts from the supplied demo are includ
 | 10-car train — In 8 minutes | DSSAudioDemo.wav, 17.58–20.88 seconds |
 | 6-car train — Platform 1 | DSSAudioDemo.wav, 20.98–24.36 seconds |
 | Next station | Next_Station_AF.wav |
-| Richmond | Richmond_AF.wav |
 | SFO Airport | SFO_AF.wav |
 | Red line — North Berkeley | red_line.wav followed by NorthBerkeley.wav, joined into RedLineNorthBerkeley.wav |
-| End of the line | EndofLine.wav |
 | Loud wheels | 241915__alexbird__loud_wheels.wav |
 | Train departing | 38732__shimsewn__bart-departure.wav |
 | Out of service | OutofService.wav |
 
-The seven standalone station/onboard announcements were supplied from [FOIA.fm’s BART archive](https://foia.fm/bayarea/BART/), which does not specify a reuse license. The two DSS excerpts retain the original PCM samples and have been trimmed at pauses; the source file in Downloads was left untouched. Reproduce a cut with `node scripts/trim-wav.mjs input.wav output.wav startSeconds endSeconds`.
+The original standalone station/onboard announcements were supplied from [FOIA.fm’s BART archive](https://foia.fm/bayarea/BART/), which does not specify a reuse license. The two DSS excerpts retain the original PCM samples and have been trimmed at pauses; the source file in Downloads was left untouched. Reproduce a cut with `node scripts/trim-wav.mjs input.wav output.wav startSeconds endSeconds`.
 
 The red-line/North Berkeley button concatenates the original PCM recordings, removing excess silence only at the join. It is 3.262 seconds long. Reproduce it with `node scripts/combine-wav.mjs audio/red_line.wav audio/NorthBerkeley.wav audio/RedLineNorthBerkeley.wav`.
 
