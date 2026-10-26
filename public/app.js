@@ -1,14 +1,13 @@
 const $ = selector => document.querySelector(selector);
+// Solid, original wayfinding pictograms. Cutouts inherit the panel behind them.
+const train = '<path fill-rule="evenodd" d="M10 2h12c4 0 6 3 6 7v12c0 3-2 5-5 5H9c-3 0-5-2-5-5V9c0-4 2-7 6-7ZM9 7v9h14V7H9Zm3 14a2 2 0 1 0-4 0 2 2 0 0 0 4 0Zm12 0a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z"/><path d="m10 25-5 7h4l2-3h10l2 3h4l-5-7h-4l1 2h-6l1-2z"/>';
 const paths = {
-  doors: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M8 12h1m6 0h1"/>',
-  pin: '<path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
-  horn: '<path d="m4 10 10-3 5-4v18l-5-4-10-3zM7 15v5h4l-1-4M22 9v6"/>',
-  wave: '<path d="M3 10v4m4-8v12m5-16v20m5-16v12m4-8v4"/>',
-  train: '<rect x="5" y="2" width="14" height="17" rx="4"/><path d="M5 11h14M12 3v8M8 19l-2 3m10-3 2 3M8 15h1m6 0h1"/>',
-  plane: '<path d="m21 3-6 18-4-8-8-4zM11 13 21 3"/>',
-  flag: '<path d="M5 22V3c5-5 9 5 15 0v11c-6 5-10-5-15 0"/>',
-  spark: '<path d="m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>',
-  moon: '<path d="M21 14a9 9 0 0 1-11-11A9 9 0 1 0 21 14Z"/>'
+  train,
+  station: '<path d="M1 14h8v4H1zm22 0h8v4h-8z"/><path fill-rule="evenodd" d="M16 5a11 11 0 1 0 0 22 11 11 0 0 0 0-22Zm0 5a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z"/>',
+  plane: '<path d="M14 4c0-4 4-4 4 0v8l12 8v4l-12-4v7l5 3v2l-7-2-7 2v-2l5-3v-7l-12 4v-4l12-8z"/>',
+  closed: '<path fill-rule="evenodd" d="M16 1a15 15 0 1 0 0 30 15 15 0 0 0 0-30ZM7 13h18v6H7z"/>',
+  wheels: '<path fill-rule="evenodd" d="M12 10a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 4a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z"/><circle cx="12" cy="20" r="2.5"/><path d="M2 31h20v-3H2z"/><path d="M23 12c3 3 3 7 0 10M27 7c6 6 6 14 0 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"/>',
+  departure: `<g transform="translate(-1 7) scale(.74)">${train}</g><path d="M21 5h5l-3-3 2-2 7 7-7 7-2-2 3-3h-5z"/>`
 };
 let sounds = [], audio = null, activeId = null, loop = false, frame, db, updating = false;
 const custom = new Map();
@@ -20,7 +19,9 @@ function render() {
     button.dataset.id = sound.id;
     button.setAttribute('aria-pressed', String(activeId === sound.id));
     button.setAttribute('aria-label', `${sound.title}, ${custom.has(sound.id) ? 'your recording' : sound.kind}`);
-    button.innerHTML = `<span class="sound-icon" aria-hidden="true"><svg viewBox="0 0 24 24">${paths[sound.icon]}</svg></span><span class="play-glyph" aria-hidden="true">${activeId === sound.id ? '■' : '▶'}</span><span class="sound-title"></span><span class="sound-subtitle"></span><span class="sound-kind"></span>`;
+    button.innerHTML = `<span class="sound-icon" aria-hidden="true"><svg viewBox="0 0 32 32">${paths[sound.icon]}</svg></span><span class="route-badge" aria-hidden="true"></span><span class="play-glyph" aria-hidden="true">${activeId === sound.id ? '■' : '▶'}</span><span class="sound-title"></span><span class="sound-subtitle"></span><span class="sound-kind"></span>`;
+    button.querySelector('.route-badge').textContent = sound.badge || '';
+    button.querySelector('.route-badge').hidden = !sound.badge;
     button.querySelector('.sound-title').textContent = sound.title;
     button.querySelector('.sound-subtitle').textContent = sound.subtitle;
     button.querySelector('.sound-kind').textContent = custom.has(sound.id) ? 'Your recording' : sound.kind;
