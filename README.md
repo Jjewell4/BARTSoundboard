@@ -40,11 +40,11 @@ Only user-supplied recordings and two excerpts from the supplied demo are includ
 | Train departing | 38732__shimsewn__bart-departure.wav |
 | Out of service | OutofService.wav |
 
-The original standalone station/onboard announcements were supplied from [FOIA.fm’s BART archive](https://foia.fm/bayarea/BART/), which does not specify a reuse license. The two DSS excerpts retain the original PCM samples and have been trimmed at pauses; the source file in Downloads was left untouched. Reproduce a cut with `node scripts/trim-wav.mjs input.wav output.wav startSeconds endSeconds`.
+The original standalone station/onboard announcements were supplied from [FOIA.fm’s BART archive](https://foia.fm/bayarea/BART/), which does not specify a reuse license. The two DSS announcement clips are from the BART.gov blog (source attribution supplied by the owner). The two DSS source excerpts retain the original PCM samples and have been trimmed at pauses; the source file in Downloads was left untouched. Reproduce a cut with `node scripts/trim-wav.mjs input.wav output.wav startSeconds endSeconds`.
 
 The red-line/North Berkeley button concatenates the original PCM recordings, removing excess silence only at the join. It is 3.262 seconds long. Reproduce it with `node scripts/combine-wav.mjs audio/red_line.wav audio/NorthBerkeley.wav audio/RedLineNorthBerkeley.wav`.
 
-“bart departure.wav” by **shimsewn**, [Freesound](https://freesound.org/people/shimsewn/sounds/38732/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Original recording, unchanged.
+“bart departure.wav” by **shimsewn**, [Freesound](https://freesound.org/people/shimsewn/sounds/38732/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Original source preserved; playback copy volume balanced.
 
 “loud_wheels.wav” by **alexbird**, [Freesound](https://freesound.org/people/alexbird/sounds/241915/). Original recording supplied by the owner, unchanged; the source license could not be verified during this update.
 
@@ -55,3 +55,7 @@ This is an unofficial personal costume project, with no BART affiliation or endo
 GitHub stores exact base64 copies (`audio/*.wav.b64`) because the publishing connection supports text. The build decodes these to normal WAV files without a quality change. Local `.wav` files take precedence and are ignored by Git. To change a recording, update its `.b64` too. `scripts/catalog.mjs` defines the buttons. Missing audio causes a build error rather than a synthesized substitute.
 
 The service worker caches every bundled recording and supports Safari byte-range requests offline. Browser tests cover 320×568 through 430×932 portrait screens and two landscape sizes, checking that every button is visible without scrolling and has a minimum 44-pixel touch target. `scripts/upgrade-smoke.mjs` reproduces a stale Chrome page with the original caching behavior, verifies automatic migration to the new app, then checks recovery preserves personal recordings and offline playback. Real-device iPhone installation and speaker routing should also be checked after deployment.
+
+## Volume balancing
+
+The build adjusts each bundled recording with constant gain toward -18 dBFS active RMS, leaving at least 1 dB of sample-peak headroom. Measurement uses 50 ms windows and excludes windows more than 20 dB below the loudest window so silence does not cause over-amplification. Original WAV/base64 files stay untouched; exported playback copies retain their format, duration, and dynamics. This reduces level differences but is not a guarantee of identical perceived loudness between speech and train noise. Custom recordings are played as imported.
