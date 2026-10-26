@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile, cp, readdir, unlink } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { sounds } from './catalog.mjs';
+import { normalizeWav } from './normalize-wav.mjs';
 import { icon } from './effects.mjs';
 await mkdir('dist/audio', { recursive: true });
 for (const file of await readdir('dist/audio')) {
@@ -16,7 +17,9 @@ for (const sound of sounds) {
     catch { throw new Error(`Missing supplied recording: ${sound.file}. Add it to audio/ before building.`); }
   }
   if (data.toString('ascii', 0, 4) !== 'RIFF' || data.toString('ascii', 8, 12) !== 'WAVE') throw new Error(`Invalid WAV: ${sound.file}`);
-  await writeFile(`dist/audio/${sound.file}`, data);
+  const normalized = normalizeWav(data);
+  console.log(`${sound.title}: ${normalized.gainDb.toFixed(1)} dB volume adjustment`);
+  await writeFile(`dist/audio/${sound.file}`, normalized.data);
   catalog.push({ ...sound, url: `/audio/${sound.file}` });
 }
 await writeFile('dist/sounds.json', JSON.stringify(catalog));
