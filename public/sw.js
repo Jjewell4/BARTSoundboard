@@ -10,6 +10,7 @@ self.addEventListener('activate', event => {
   })());
 });
 self.addEventListener('message', event => {
+  if (event.data === 'ACTIVATE_UPDATE') event.waitUntil(self.skipWaiting());
   if (event.data === 'STATUS') event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
     const present = await Promise.all(ASSETS.map(path => cache.match(path)));
