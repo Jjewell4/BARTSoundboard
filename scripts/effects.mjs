@@ -1,23 +1,5 @@
 import { deflateSync } from 'node:zlib';
 
-export function wav(seconds, sample) {
-  const rate = 22050, length = Math.floor(seconds * rate), b = Buffer.alloc(44 + length * 2);
-  b.write('RIFF'); b.writeUInt32LE(b.length - 8, 4); b.write('WAVEfmt ', 8); b.writeUInt32LE(16, 16);
-  b.writeUInt16LE(1, 20); b.writeUInt16LE(1, 22); b.writeUInt32LE(rate, 24); b.writeUInt32LE(rate * 2, 28);
-  b.writeUInt16LE(2, 32); b.writeUInt16LE(16, 34); b.write('data', 36); b.writeUInt32LE(length * 2, 40);
-  for (let i = 0; i < length; i++) {
-    const t = i / rate, fade = Math.min(1, t * 30, (seconds - t) * 15);
-    b.writeInt16LE(Math.round(Math.max(-1, Math.min(1, sample(t) * fade)) * 26000), 44 + i * 2);
-  }
-  return b;
-}
-const sin = (f, t) => Math.sin(2 * Math.PI * f * t);
-export function effect(id) {
-  if (id === 'doors') return wav(2.4, t => t % .6 < .25 ? .42 * sin(880, t) + .12 * sin(1760, t) : 0);
-  if (id === 'horn') return wav(2.8, t => ((t < 1.1 || t > 1.45) ? .7 : 0) * (.4 * sin(311, t) + .3 * sin(370, t) + .2 * sin(466, t)));
-  return wav(7, t => (.26 * sin(760 + 20 * t, t) + .13 * sin(1150 + 15 * t, t) + .10 * sin(94, t)) * Math.sin(Math.PI * t / 7));
-}
-
 function crc32(b) {
   let crc = -1;
   for (const byte of b) { crc ^= byte; for (let k = 0; k < 8; k++) crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1)); }
