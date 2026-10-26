@@ -6,7 +6,7 @@ const paths = {
   station: '<path d="M1 14h8v4H1zm22 0h8v4h-8z"/><path fill-rule="evenodd" d="M16 5a11 11 0 1 0 0 22 11 11 0 0 0 0-22Zm0 5a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z"/>',
   plane: '<path d="M14 4c0-4 4-4 4 0v8l12 8v4l-12-4v7l5 3v2l-7-2-7 2v-2l5-3v-7l-12 4v-4l12-8z"/>',
   closed: '<path fill-rule="evenodd" d="M16 1a15 15 0 1 0 0 30 15 15 0 0 0 0-30ZM7 13h18v6H7z"/>',
-  wheels: '<path fill-rule="evenodd" d="M12 10a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 4a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z"/><circle cx="12" cy="20" r="2.5"/><path d="M2 31h20v-3H2z"/><path d="M23 12c3 3 3 7 0 10M27 7c6 6 6 14 0 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"/>',
+  wheels: '<g transform="translate(1.5 1.5) scale(.88)"><path fill-rule="evenodd" d="M12 10a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 4a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z"/><circle cx="12" cy="20" r="2.5"/><path d="M2 31h20v-3H2z"/><path d="M23 12c3 3 3 7 0 10M27 7c6 6 6 14 0 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></g>',
   departure: `<g transform="translate(-1 7) scale(.74)">${train}</g><path d="M21 5h5l-3-3 2-2 7 7-7 7-2-2 3-3h-5z"/>`
 };
 let sounds = [], audio = null, activeId = null, loop = false, frame, db, updating = false;
